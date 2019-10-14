@@ -1,0 +1,9 @@
+name: Sell
+api: 3.0.0
+main: phuongaz\sell\Main
+version: 1.2.13
+author: phuongaz
+depend: EconomyAPI
+commands:
+  sell:
+    description: "Sell Menu"
