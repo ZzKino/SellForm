@@ -5,7 +5,7 @@ Plugin Pocketmine
 
 | View Count |
 | :---: |
-| [![View Count](http://hits.dwyl.io/ZzKino/ARWarpS.svg)](http://hits.dwyl.io/ZzKino/SellForm.svg) |
+| [![View Count](http://hits.dwyl.io/ZzKino/SellForm.svg)](http://hits.dwyl.io/ZzKino/SellForm.svg) |
 
 # Depend
  + FormAPI
