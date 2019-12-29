@@ -7,3 +7,5 @@ depend: EconomyAPI
 commands:
   sell:
     description: "Sell Menu"
+  autosell:
+    description: Auto sell inventory
