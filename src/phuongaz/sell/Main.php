@@ -13,23 +13,34 @@ use pocketmine\command\Command;
 use pocketmine\command\CommandSender;
 use pocketmine\utils\Config;
 use pocketmine\utils\TextFormat as TF;
+
 use onebone\economyapi\EconomyAPI;
 use jojoe77777\FormAPI\
 {
 	SimpleForm,
 	CustomForm
 };
-class Main extends PluginBase{
+use pocketmine\event\{Listener, block\BlockBreakEvent};
+
+class Main extends PluginBase implements Listener{
+
+	public $can;
+	public $prefix = "§7[§a Auto Sell §7]";
+
 
 	public function onEnable(){
-		$file = "sell.yml";
-		
-		if(!file_exists($this->getDataFolder() . $file)) {
+		$file = 'sell.yml';
+
+			if(!file_exists($this->getDataFolder() . $file)) {
 				@mkdir($this->getDataFolder());
 				file_put_contents($this->getDataFolder() . $file, $this->getResource($file));
-		}
-		$this->sell = new Config($this->getDataFolder() . "sell.yml", Config::YAML);
+			}
+			$this->sell = new Config($this->getDataFolder() . "sell.yml", Config::YAML);
+				
+	
 		$this->getLogger()->info(TF::BOLD. TF::GREEN."> Plugin by phuongaz");
+		$this->getServer()->getPluginManager()->registerEvents($this, $this);
+
 	}
 
 
@@ -57,7 +68,27 @@ class Main extends PluginBase{
 				$form->addButton("§l§e> §bBán tất cả vật phẩm§l§e >");
 				$form->sendToPlayer($sender);
 			}
-		}
+		}elseif($cmd->getName() == "autosell"){
+				if(!$sender->hasPermission('autosell')){
+					return true;
+				}
+		       if(!isset($args[0])){
+			      $sender->sendMessage($this->prefix." /autosell on | off");
+			       return true;
+		      }
+		      if($args[0] == "on"){
+			     $this->can[$sender->getName()] = true;
+			   $sender->sendMessage($this->prefix."§a bạn đã bật chức năng tự động bán");
+			}
+			if($args[0] == "off"){
+				if(isset($this->can[$sender->getName()])){
+					unset($this->can[$sender->getName()]);
+					$sender->sendMessage($this->prefix."§c Bạn đã tắt chức năng tự động bán");
+					return true;
+				}
+				$sender->sendMessage($this->prefix."§c Bạn chưa bật chức năng tự động bán");
+			}
+	    }
 		return true;
 	}
 
@@ -116,4 +147,28 @@ class Main extends PluginBase{
 		$form->addLabel("§l§e>§a $iname §d|§a $count §d|§a $price");
 		$form->sendToPlayer($player);		
 	}
+
+	public function AutoSell($player) :bool
+	{
+		if(isset($this->can[$player->getName()])){
+			return true;
+		}
+		return false;
+	}
+
+	public function onBreak(BlockBreakEvent $event) {
+		
+		$player = $event->getPlayer();
+		if($this->AutoSell($player) == false) return true;
+		foreach($event->getDrops() as $drop) {
+			if(!$player->getInventory()->canAddItem($drop)) {
+				$event->getPlayer()->addTitle("§l§a✠§6 FULL INVENTORY §a✠", "§l§cTự động bán!");
+                $this->sellAll($player);
+
+            }
+				break; 
+			}
+	}
+
+
 }
